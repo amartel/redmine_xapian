@@ -66,7 +66,7 @@ module XapianSearch
         dochash=Hash[*docdata.scan(/(url|sample|modtime|type|size)=\/?([^\n\]]+)/).flatten]
         if not dochash.nil? then
           if !repository.is_a?(Repository)
-            docattach=Attachment.scoped (:conditions =>  find_conditions ).first
+            docattach=Attachment.where(:disk_filename => dochash.fetch('url')).first
             if not docattach.nil? then
               if docattach.visible?
                 container = docattach.container
