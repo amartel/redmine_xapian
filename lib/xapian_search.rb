@@ -87,7 +87,7 @@ module XapianSearch
             end
           else
             path = URI.unescape(dochash.fetch('url'))
-            xs = XapianSearch::FileResult.new(repository.project, path, {:controller => 'repositories', :action => 'entry', :format => 'raw', :id => repository.project.identifier, :repository_id => repository.identifier, :path => path.sub(/^\//, '').split(%r{[/\\]}).select {|p| !p.blank?}}, "CONTENT: "+dochash["sample"], "", File.ctime(repository.url + "/" + path))
+            xs = XapianSearch::FileResult.new(repository.project, path, {:controller => 'repositories', :action => 'raw', :id => repository.project.identifier, :repository_id => repository.identifier, :path => path.sub(/^\//, '').split(%r{[/\\]}).select {|p| !p.blank?}}, "CONTENT: "+dochash["sample"], "", File.ctime(repository.url + "/" + path))
             Rails.logger.debug "offset: #{offset}   xs.event_datetime: #{xs.event_datetime}"
             nbmatches += 1
             if (not offset) or (before and xs.event_datetime < offset) or (xs.event_datetime > offset and not before)
