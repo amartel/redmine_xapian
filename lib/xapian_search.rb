@@ -66,18 +66,19 @@ module XapianSearch
         dochash=Hash[*docdata.scan(/(url|sample|modtime|type|size)=\/?([^\n\]]+)/).flatten]
         if not dochash.nil? then
           if !repository.is_a?(Repository)
-            docattach=Attachment.where(:disk_filename => dochash.fetch('url')).first
+            docattach=Attachment.where("disk_filename = ?", File.basename(dochash.fetch('url'))).first
             if not docattach.nil? then
               if docattach.visible?
                 container = docattach.container
-                if repository.has_key?(container.project.id)
+                projid = container.is_a?(Project) ? container.id : container.project.id
+                if repository.has_key?(projid)
                   nbmatches += 1
                   if ((not offset) or (before and docattach.created_on < offset) or (docattach.created_on > offset and not before))
                     title = docattach.filename
                     if !docattach.description.blank?
                       title += " (#{docattach.description})"
                     end
-                    title += " [#{container.event_title}]"
+                    title += container.is_a?(Project) ? " [File]" : " [#{container.event_title}]"
                     prj = container.is_a?(Project) ? container : container.project
                     xs = XapianSearch::FileResult.new(prj, title, docattach.event_url, "CONTENT: "+dochash["sample"], docattach.author, docattach.created_on)
                     xpattachments << xs
